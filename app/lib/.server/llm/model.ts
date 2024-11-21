@@ -1,6 +1,6 @@
 // @ts-nocheck
 // Preventing TS checks with files presented in the video for a better presentation.
-import { getAPIKey, getBaseURL } from '~/lib/.server/llm/api-key';
+import { getAPIKey, getBaseURL, getAmazonBedrockCredentials } from '~/lib/.server/llm/api-key';
 import { createAnthropic } from '@ai-sdk/anthropic';
 import { createOpenAI } from '@ai-sdk/openai';
 import { createAzure } from '@ai-sdk/azure';
@@ -9,6 +9,7 @@ import { ollama } from 'ollama-ai-provider';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { createMistral } from '@ai-sdk/mistral';
 import { createCohere } from '@ai-sdk/cohere';
+import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock';
 
 export function getAnthropicModel(apiKey: string, model: string) {
   const anthropic = createAnthropic({
@@ -16,6 +17,15 @@ export function getAnthropicModel(apiKey: string, model: string) {
   });
 
   return anthropic(model);
+}
+export function getBedrockModel(region: string, accessKeyId: string, secretAccessKey: string, model: string) {
+  const bedrock = createAmazonBedrock({
+    region,
+    accessKeyId,
+    secretAccessKey,
+  });
+
+  return bedrock(model);
 }
 export function getOpenAILikeModel(baseURL: string, apiKey: string, model: string) {
   const openai = createOpenAI({
@@ -131,6 +141,7 @@ export function getXAIModel(apiKey: string, model: string) {
 export function getModel(provider: string, model: string, env: Env, apiKeys?: Record<string, string>) {
   const apiKey = getAPIKey(env, provider, apiKeys);
   const baseURL = getBaseURL(env, provider);
+  const amazonBedrockCredentials = getAmazonBedrockCredentials(env);
 
   switch (provider) {
     case 'Anthropic':
@@ -159,6 +170,13 @@ export function getModel(provider: string, model: string, env: Env, apiKeys?: Re
       return getXAIModel(apiKey, model);
     case 'Cohere':
       return getCohereAIModel(apiKey, model);
+    case 'AmazonBedrock':
+      return getBedrockModel(
+        amazonBedrockCredentials.region,
+        amazonBedrockCredentials.accessKeyId,
+        amazonBedrockCredentials.secretAccessKey,
+        model,
+      );
     default:
       return getOllamaModel(baseURL, model);
   }

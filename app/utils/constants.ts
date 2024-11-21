@@ -37,6 +37,24 @@ const PROVIDER_LIST: ProviderInfo[] = [
     getApiKeyLink: 'https://console.anthropic.com/settings/keys',
   },
   {
+    name: 'AmazonBedrock',
+    staticModels: [
+      {
+        name: 'us.anthropic.claude-3-5-sonnet-20241022-v2:0',
+        label: 'Claude 3.5 Sonnet (new)',
+        provider: 'AmazonBedrock',
+        maxTokenAllowed: 8000,
+      },
+      {
+        name: 'us.anthropic.claude-3-5-haiku-20241022-v1:0',
+        label: 'Claude 3.5 Haiku (new)',
+        provider: 'AmazonBedrock',
+        maxTokenAllowed: 8000,
+      },
+    ],
+    getApiKeyLink: 'https://aws.amazon.com/bedrock/',
+  },
+  {
     name: 'Ollama',
     staticModels: [],
     getDynamicModels: getOllamaModels,
